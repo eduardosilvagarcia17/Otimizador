@@ -1,0 +1,440 @@
+ 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimizador | Gestão de Energia</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <div class="container">
+
+        <aside class="sidebar">
+            <h2>⚡ Otimizador</h2>
+
+            <nav>
+                 <a href="#" class="ativo" onclick="mostrarTela('inicio'); return false;">Visão geral</a>
+<a href="#" onclick="mostrarTela('equipamentos'); return false;">Equipamentos</a>
+                <a href="#">Processos</a>
+                <a href="#">Consumo de energia</a>
+                <a href="#">Relatórios</a>
+                <a href="#">Configurações</a>
+            </nav>
+        </aside>
+
+        <main class="conteudo">
+            <header class="topo">
+                <div>
+                    <h1>Visão geral</h1>
+                    <p>Acompanhe o desempenho energético da empresa.</p>
+                </div>
+            </header>
+
+             
+<section class="indicadores">
+
+    <div class="card">
+        <div class="card-topo">
+            <span>Equipamentos cadastrados</span>
+            <span class="icone">💻</span>
+        </div>
+        <h2 id="total-equipamentos">0</h2>
+        <p class="comparacao">Sem histórico disponível</p>
+    </div>
+
+    <div class="card">
+        <div class="card-topo">
+            <span>Consumo estimado</span>
+            <span class="icone">⚡</span>
+        </div>
+        <h2><span id="consumo-total">0.00</span> kWh</h2>
+        <p class="comparacao">Sem histórico disponível</p>
+    </div>
+
+    <div class="card">
+        <div class="card-topo">
+            <span>Custo mensal estimado</span>
+            <span class="icone">💰</span>
+        </div>
+        <h2>R$ <span id="custo-total">0,00</span></h2>
+        <p class="comparacao">Sem histórico disponível</p>
+    </div>
+
+    <div class="card">
+    <div class="card-topo">
+        <span>Equipamentos ociosos</span>
+        <span class="icone">💤</span>
+    </div>
+    <h2 id="total-ociosos">0</h2>
+    <p class="comparacao">Nenhum equipamento ocioso identificado</p>
+</div>
+
+    
+
+    <div class="card">
+        <div class="card-topo">
+            <span>Economia potencial</span>
+            <span class="icone">📈</span>
+        </div>
+        <h2>R$ <span id="economia-total">0,00</span></h2>
+        <p class="comparacao">Estimativa mensal</p>
+    </div>
+
+</section>
+
+<section id="tela-equipamentos" style="display: none;">
+
+    <header class="topo">
+        <h1>Equipamentos</h1>
+        <p>Cadastre e acompanhe os equipamentos da empresa.</p>
+    </header>
+
+     
+<div class="card">
+    <h2>Cadastro de equipamentos</h2>
+    <p>Preencha as informações do equipamento.</p>
+
+    <form id="form-equipamento">
+
+        <label for="nome">Nome do equipamento</label>
+        <input type="text" id="nome" placeholder="Ex: Computador administrativo" required>
+
+        <label for="tipo">Tipo de equipamento</label>
+        <select id="tipo" required>
+            <option value="">Selecione o tipo</option>
+            <option value="Computador">Computador</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Servidor">Servidor</option>
+            <option value="Impressora">Impressora</option>
+            <option value="Outro">Outro</option>
+        </select>
+
+        <label for="potencia">Potência (Watts)</label>
+        <input type="number" id="potencia" placeholder="Ex: 300" min="1" required>
+
+        <label for="horas">Horas de funcionamento por dia</label>
+        <input type="number" id="horas" placeholder="Ex: 8" min="0" max="24" step="0.5" required>
+
+        <label for="status">Status do equipamento</label>
+        <select id="status" required>
+            <option value="Ativo">Ativo</option>
+            <option value="Ocioso">Ocioso</option>
+        </select>
+
+        <button type="submit">Cadastrar equipamento</button>
+
+    </form>
+</div>
+
+ <div class="card" style="margin-top: 20px;">
+    <h2>Equipamentos cadastrados</h2>
+    <p id="mensagem-lista">Nenhum equipamento cadastrado ainda.</p>
+
+    <div id="lista-equipamentos"></div>
+</div>
+
+
+</section>
+
+
+        </main>
+    </div>
+
+     <script>
+
+    function mostrarTela(tela) {
+
+        const inicio = document.querySelector('.indicadores');
+        const equipamentos = document.getElementById('tela-equipamentos');
+
+        if (tela === 'inicio') {
+            inicio.style.display = 'grid';
+            equipamentos.style.display = 'none';
+        } else if (tela === 'equipamentos') {
+            inicio.style.display = 'none';
+            equipamentos.style.display = 'block';
+        }
+
+    }
+
+    const formulario = document.getElementById('form-equipamento');
+    const lista = document.getElementById('lista-equipamentos');
+    const mensagemLista = document.getElementById('mensagem-lista');
+
+    async function carregarEquipamentos() {
+    try {
+        const resposta = await fetch('/api/equipamentos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao buscar equipamentos.');
+        }
+
+        const equipamentos = await resposta.json();
+
+        console.log('Equipamentos encontrados no banco:', equipamentos);
+        // Limpa a lista antes de mostrar os equipamentos do banco
+lista.innerHTML = '';
+
+equipamentos.forEach(function(equipamento) {
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginTop = '15px';
+
+    const titulo = document.createElement('h3');
+    titulo.textContent = equipamento.nome;
+
+    const detalhes = document.createElement('p');
+    detalhes.textContent =
+        'Tipo: ' + equipamento.tipo +
+        ' | Potência: ' + equipamento.potencia + ' W' +
+        ' | Funcionamento: ' + equipamento.horas + ' h/dia' +
+        ' | Status: ' + equipamento.status;
+
+    const consumoMensal =
+        (equipamento.potencia * equipamento.horas * 30) / 1000;
+
+    const consumo = document.createElement('p');
+    consumo.textContent =
+        'Consumo estimado: ' +
+        consumoMensal.toFixed(2) + ' kWh/mês';
+
+     card.appendChild(titulo);
+card.appendChild(detalhes);
+card.appendChild(consumo);
+
+// Cria o botão Editar
+const botaoEditar = document.createElement('button');
+
+botaoEditar.textContent = '✏️ Editar';
+
+botaoEditar.style.backgroundColor = '#2563eb';
+botaoEditar.style.color = 'white';
+botaoEditar.style.border = 'none';
+botaoEditar.style.padding = '10px 15px';
+botaoEditar.style.borderRadius = '6px';
+botaoEditar.style.cursor = 'pointer';
+botaoEditar.style.marginTop = '10px';
+botaoEditar.style.marginRight = '10px';
+
+// Programa o clique no botão Editar
+botaoEditar.addEventListener('click', async function() {
+
+    const novoNome = prompt('Nome do equipamento:', equipamento.nome);
+
+    if (novoNome === null) return;
+
+    if (novoNome.trim() === '') {
+        alert('O nome não pode ficar vazio.');
+        return;
+    }
+
+    const novaPotencia = prompt('Potência em watts:', equipamento.potencia);
+
+    if (novaPotencia === null) return;
+
+    const novasHoras = prompt('Horas de funcionamento por dia:', equipamento.horas);
+
+    if (novasHoras === null) return;
+
+    const potencia = Number(novaPotencia);
+    const horas = Number(novasHoras);
+
+    if (
+        novaPotencia.trim() === '' ||
+        novasHoras.trim() === '' ||
+        !Number.isFinite(potencia) ||
+        !Number.isFinite(horas) ||
+        potencia <= 0 ||
+        horas < 0 ||
+        horas > 24
+    ) {
+        alert('Informe uma potência válida e horas entre 0 e 24.');
+        return;
+    }
+
+    try {
+        const resposta = await fetch('/api/equipamentos/' + equipamento.id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: novoNome.trim(),
+                tipo: equipamento.tipo,
+                potencia: potencia,
+                horas: horas,
+                status: equipamento.status
+            })
+        });
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao atualizar equipamento.');
+        }
+
+        await carregarEquipamentos();
+
+        alert('Equipamento atualizado com sucesso!');
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível atualizar o equipamento.');
+    }
+});
+
+// Adiciona o botão Editar ao cartão
+card.appendChild(botaoEditar);
+
+// Cria o botão Excluir
+const botaoExcluir = document.createElement('button');
+
+botaoExcluir.textContent = '🗑️ Excluir';
+
+botaoExcluir.style.backgroundColor = '#dc3545';
+botaoExcluir.style.color = 'white';
+botaoExcluir.style.border = 'none';
+botaoExcluir.style.padding = '10px 15px';
+botaoExcluir.style.borderRadius = '6px';
+botaoExcluir.style.cursor = 'pointer';
+botaoExcluir.style.marginTop = '10px';
+
+// Adiciona o botão ao cartão
+card.appendChild(botaoExcluir);
+
+// Programa o clique no botão Excluir
+botaoExcluir.addEventListener('click', async function() {
+
+    // Pede confirmação antes de excluir
+    const confirmar = confirm(
+        'Deseja realmente excluir o equipamento "' + equipamento.nome + '"?'
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        // Solicita ao Spring Boot a exclusão do equipamento
+        const resposta = await fetch('/api/equipamentos/' + equipamento.id, {
+            method: 'DELETE'
+        });
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao excluir equipamento.');
+        }
+
+        // Atualiza a lista e os indicadores
+        await carregarEquipamentos();
+
+        alert('Equipamento excluído com sucesso!');
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível excluir o equipamento.');
+    }
+});
+
+// Mostra o cartão na lista
+lista.appendChild(card);
+});
+
+// Esconde a mensagem quando existem equipamentos cadastrados
+mensagemLista.style.display =
+    equipamentos.length > 0 ? 'none' : 'block';
+
+    // Calcula os indicadores usando os equipamentos do banco
+let consumoTotal = 0;
+let custoTotal = 0;
+let totalOciosos = 0;
+let economiaTotal = 0;
+
+equipamentos.forEach(function(equipamento) {
+
+    const consumoMensal =
+        (equipamento.potencia * equipamento.horas * 30) / 1000;
+
+    const custoMensal = consumoMensal * 0.90;
+
+    consumoTotal += consumoMensal;
+    custoTotal += custoMensal;
+
+    if (equipamento.status === 'Ocioso') {
+        totalOciosos++;
+        economiaTotal += custoMensal * 0.50;
+    }
+});
+
+// Atualiza os cinco indicadores
+document.getElementById('total-equipamentos').textContent =
+    equipamentos.length;
+
+document.getElementById('consumo-total').textContent =
+    consumoTotal.toFixed(2);
+
+document.getElementById('custo-total').textContent =
+    custoTotal.toFixed(2).replace('.', ',');
+
+document.getElementById('total-ociosos').textContent =
+    totalOciosos;
+
+document.getElementById('economia-total').textContent =
+    economiaTotal.toFixed(2).replace('.', ',');
+        
+
+    } catch (erro) {
+        console.error('Erro ao carregar equipamentos:', erro);
+    }
+}
+
+carregarEquipamentos();
+
+    formulario.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const nome = document.getElementById('nome').value.trim();
+        const tipo = document.getElementById('tipo').value;
+        const potencia = Number(document.getElementById('potencia').value);
+        const horas = Number(document.getElementById('horas').value);
+        const status = document.getElementById('status').value;
+
+        // Envia os dados do equipamento para o Spring Boot
+try {
+    const resposta = await fetch('/api/equipamentos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            nome: nome,
+            tipo: tipo,
+            potencia: potencia,
+            horas: horas,
+            status: status
+        })
+    });
+
+    if (!resposta.ok) {
+        throw new Error('Erro ao salvar equipamento no banco de dados.');
+    }
+
+    console.log('Equipamento salvo no banco de dados!');
+
+} catch (erro) {
+    console.error(erro);
+    alert('Não foi possível salvar o equipamento. Verifique o Spring Boot.');
+    return;
+}
+
+        
+
+         formulario.reset();
+
+await carregarEquipamentos();
+    });
+
+</script>
+
+</body>
+</html>
