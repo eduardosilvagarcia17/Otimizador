@@ -216,9 +216,9 @@
             custos operacionais e oportunidades de economia.
         </p>
 
-        <div id="resumo-relatorio">
-            <p>Carregando dados do relatório...</p>
-        </div>
+       <div id="resumo-relatorio" class="resumo-relatorio-grid">
+    <p>Carregando dados do relatório...</p>
+</div>
 
     </div>
 
@@ -239,11 +239,14 @@
 
     <div class="card" style="margin-top: 20px;">
 
-        <h3>💡 Conclusões da análise</h3>
+       <div class="cabecalho-conclusoes">
+    <h3>💡 Conclusões e recomendações</h3>
+    <p>Oportunidades identificadas para reduzir custos operacionais.</p>
+</div>
 
-        <div id="conclusoes-relatorio">
-            <p>Aguardando análise dos equipamentos...</p>
-        </div>
+<div id="conclusoes-relatorio" class="destaque-conclusoes">
+    <p>Aguardando análise dos equipamentos...</p>
+</div>
 
         <button type="button" onclick="window.print()"
                 style="margin-top: 20px; padding: 12px 20px; cursor: pointer;">
@@ -266,6 +269,24 @@
             Acompanhe o consumo mensal estimado dos equipamentos
             e identifique quais geram os maiores custos operacionais.
         </p>
+
+
+<div class="resumo-consumo">
+    <div class="card">
+        <h3>⚡ Consumo mensal</h3>
+        <h2 id="total-consumo">0,00 kWh</h2>
+    </div>
+
+    <div class="card">
+        <h3>💰 Custo mensal estimado</h3>
+        <h2 id="total-custo">R$ 0,00</h2>
+    </div>
+
+    <div class="card">
+        <h3>🖥️ Equipamentos cadastrados</h3>
+        <h2 id="total-equipamentos-consumo">0</h2>
+    </div>
+</div>
 
         <h3>Consumo mensal por equipamento</h3>
 
@@ -1104,6 +1125,26 @@ async function carregarGraficoConsumo() {
         const nomes = ordenados.map(item => item.nome);
         const consumos = ordenados.map(item => item.consumo);
 
+        // Calcula os totais de consumo e custo
+const consumoTotal = ordenados.reduce((total, item) => {
+    return total + item.consumo;
+}, 0);
+
+const custoTotal = ordenados.reduce((total, item) => {
+    return total + item.custo;
+}, 0);
+
+// Atualiza os indicadores da tela
+document.getElementById('total-consumo').textContent =
+    consumoTotal.toFixed(2).replace('.', ',') + ' kWh';
+
+document.getElementById('total-custo').textContent =
+    'R$ ' + custoTotal.toFixed(2).replace('.', ',');
+
+document.getElementById('total-equipamentos-consumo').textContent =
+    equipamentos.length;
+
+
         const canvas = document.getElementById('grafico-consumo');
 
         if (graficoConsumo) {
@@ -1206,20 +1247,44 @@ async function carregarRelatorio() {
 
         resumo.innerHTML = '';
 
-        const linhas = [
-            'Equipamentos cadastrados: ' + equipamentos.length,
-            'Consumo mensal estimado: ' + consumoTotal.toFixed(2) + ' kWh',
-            'Custo mensal estimado: ' + moeda(custoTotal),
-            'Equipamentos ociosos: ' + totalOciosos,
-            'Economia potencial ilustrativa: ' + moeda(economiaTotal)
-        ];
+const indicadores = [
+    {
+        titulo: '🖥️ Equipamentos cadastrados',
+        valor: equipamentos.length
+    },
+    {
+        titulo: '⚡ Consumo mensal estimado',
+        valor: consumoTotal.toFixed(2).replace('.', ',') + ' kWh'
+    },
+    {
+        titulo: '💰 Custo mensal estimado',
+        valor: moeda(custoTotal)
+    },
+    {
+        titulo: '💤 Equipamentos ociosos',
+        valor: totalOciosos
+    },
+    {
+        titulo: '📉 Economia potencial ilustrativa',
+        valor: moeda(economiaTotal)
+    }
+];
 
-        linhas.forEach(function(texto) {
-            const p = document.createElement('p');
-            p.textContent = texto;
-            resumo.appendChild(p);
-        });
+indicadores.forEach(function(indicador) {
+    const card = document.createElement('div');
+    card.className = 'indicador-relatorio';
 
+    const titulo = document.createElement('p');
+    titulo.textContent = indicador.titulo;
+
+    const valor = document.createElement('h2');
+    valor.textContent = indicador.valor;
+
+    card.appendChild(titulo);
+    card.appendChild(valor);
+
+    resumo.appendChild(card);
+});
         conclusoes.innerHTML = '';
 
         const conclusao = document.createElement('p');
