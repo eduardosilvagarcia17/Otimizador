@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Otimizador | Gestão de Energia</title>
     <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -17,20 +18,24 @@
             <nav>
                  <a href="#" class="ativo" onclick="mostrarTela('inicio'); return false;">Visão geral</a>
 <a href="#" onclick="mostrarTela('equipamentos'); return false;">Equipamentos</a>
-                <a href="#">Processos</a>
-                <a href="#">Consumo de energia</a>
-                <a href="#">Relatórios</a>
-                <a href="#">Configurações</a>
+                <a href="#" onclick="mostrarTela('processos'); return false;">Processos</a>
+                <a href="#" onclick="mostrarTela('consumo'); return false;">
+    Consumo de energia
+</a>
+                <a href="#" onclick="mostrarTela('relatorios'); return false;">
+    Relatórios
+</a>
+               
             </nav>
         </aside>
 
         <main class="conteudo">
-            <header class="topo">
-                <div>
-                    <h1>Visão geral</h1>
-                    <p>Acompanhe o desempenho energético da empresa.</p>
-                </div>
-            </header>
+             <header class="topo" id="cabecalho-inicio">
+             <div>
+             <h1>Visão geral</h1>
+                <p>Acompanhe o desempenho energético da empresa.</p>
+            </div>
+                </header>
 
              
 <section class="indicadores">
@@ -84,6 +89,25 @@
 
 </section>
 
+<section id="secao-recomendacoes" style="margin-top: 25px;">
+
+    <div class="card">
+        <div class="card-topo">
+            <span>💡 Oportunidades de economia</span>
+        </div>
+
+        <p>
+            Recomendações baseadas no consumo estimado
+            e na situação dos equipamentos cadastrados.
+        </p>
+
+        <div id="lista-recomendacoes">
+            <p>Carregando recomendações...</p>
+        </div>
+    </div>
+
+</section>
+
 <section id="tela-equipamentos" style="display: none;">
 
     <header class="topo">
@@ -96,36 +120,78 @@
     <h2>Cadastro de equipamentos</h2>
     <p>Preencha as informações do equipamento.</p>
 
-    <form id="form-equipamento">
+    
+<form id="form-equipamento">
 
-        <label for="nome">Nome do equipamento</label>
-        <input type="text" id="nome" placeholder="Ex: Computador administrativo" required>
+    <label for="nome">Nome do equipamento</label>
+    <input
+        type="text"
+        id="nome"
+        placeholder="Ex: Computador administrativo"
+        required
+    >
 
-        <label for="tipo">Tipo de equipamento</label>
-        <select id="tipo" required>
-            <option value="">Selecione o tipo</option>
-            <option value="Computador">Computador</option>
-            <option value="Notebook">Notebook</option>
-            <option value="Servidor">Servidor</option>
-            <option value="Impressora">Impressora</option>
-            <option value="Outro">Outro</option>
-        </select>
+    <label for="tipo">Tipo de equipamento</label>
+    <select id="tipo" required>
+        <option value="">Selecione o tipo</option>
+        <option value="Computador">Computador</option>
+        <option value="Notebook">Notebook</option>
+        <option value="Servidor">Servidor</option>
+        <option value="Impressora">Impressora</option>
+        <option value="Outro">Outro</option>
+    </select>
 
-        <label for="potencia">Potência (Watts)</label>
-        <input type="number" id="potencia" placeholder="Ex: 300" min="1" required>
+    <label for="potencia">Potência (Watts)</label>
+    <input
+        type="number"
+        id="potencia"
+        placeholder="Ex: 300"
+        min="1"
+        required
+    >
 
-        <label for="horas">Horas de funcionamento por dia</label>
-        <input type="number" id="horas" placeholder="Ex: 8" min="0" max="24" step="0.5" required>
+    <label>Tempo de funcionamento por dia</label>
 
-        <label for="status">Status do equipamento</label>
-        <select id="status" required>
-            <option value="Ativo">Ativo</option>
-            <option value="Ocioso">Ocioso</option>
-        </select>
+    <div class="duracao-equipamento">
 
-        <button type="submit">Cadastrar equipamento</button>
+        <div>
+            <label for="horas">Horas</label>
+            <input
+                type="number"
+                id="horas"
+                min="0"
+                max="24"
+                step="1"
+                value="8"
+                required
+            >
+        </div>
 
-    </form>
+        <div>
+            <label for="minutos-equipamento">Minutos</label>
+            <input
+                type="number"
+                id="minutos-equipamento"
+                min="0"
+                max="59"
+                step="1"
+                value="0"
+                required
+            >
+        </div>
+
+    </div>
+
+    <label for="status">Status do equipamento</label>
+    <select id="status" required>
+        <option value="Ativo">Ativo</option>
+        <option value="Ocioso">Ocioso</option>
+    </select>
+
+    <button type="submit">Cadastrar equipamento</button>
+
+</form>
+
 </div>
 
  <div class="card" style="margin-top: 20px;">
@@ -138,26 +204,244 @@
 
 </section>
 
+<!-- TELA DE RELATÓRIOS -->
+<section id="tela-relatorios" style="display:none;">
+
+    <div class="card">
+
+        <h2>📋 Relatório de desempenho energético</h2>
+
+        <p>
+            Resumo mensal estimado do consumo de energia,
+            custos operacionais e oportunidades de economia.
+        </p>
+
+        <div id="resumo-relatorio">
+            <p>Carregando dados do relatório...</p>
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+
+        <h3>📊 Distribuição dos custos por equipamento</h3>
+
+        <p>
+            Participação de cada equipamento no custo
+            mensal estimado da empresa.
+        </p>
+
+        <div style="height: 320px; margin-top: 20px;">
+            <canvas id="grafico-relatorio"></canvas>
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+
+        <h3>💡 Conclusões da análise</h3>
+
+        <div id="conclusoes-relatorio">
+            <p>Aguardando análise dos equipamentos...</p>
+        </div>
+
+        <button type="button" onclick="window.print()"
+                style="margin-top: 20px; padding: 12px 20px; cursor: pointer;">
+            🖨️ Imprimir ou salvar em PDF
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- TELA DE CONSUMO DE ENERGIA -->
+<section id="tela-consumo" style="display:none;">
+
+    <div class="card">
+
+        <h2>⚡ Análise de consumo de energia</h2>
+
+        <p>
+            Acompanhe o consumo mensal estimado dos equipamentos
+            e identifique quais geram os maiores custos operacionais.
+        </p>
+
+        <h3>Consumo mensal por equipamento</h3>
+
+        <div style="height: 320px; margin-top: 20px;">
+            <canvas id="grafico-consumo"></canvas>
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+
+        <h3>📊 Ranking de consumo energético</h3>
+
+        <p>
+            Equipamentos ordenados do maior para o menor
+            consumo mensal estimado.
+        </p>
+
+        <div id="ranking-consumo">
+            Nenhum equipamento disponível.
+        </div>
+
+    </div>
+
+</section>
+
+
+    <section id="tela-processos" style="display: none;">
+
+    <header class="topo">
+        <h1>Processos</h1>
+        <p>Gerencie os processos associados aos equipamentos.</p>
+    </header>
+
+     <div class="card">
+    <h2>Cadastrar processo</h2>
+    <p>Registre os processos executados pelos equipamentos.</p>
+
+    
+<form id="form-processo">
+
+    <label for="nome-processo">Nome do processo</label>
+    <input
+        type="text"
+        id="nome-processo"
+        placeholder="Ex: Backup automático"
+        required
+    >
+
+    <label for="descricao-processo">Descrição</label>
+    <input
+        type="text"
+        id="descricao-processo"
+        placeholder="Ex: Cópia de segurança dos arquivos"
+        required
+    >
+
+    <label for="equipamento-processo">Equipamento associado</label>
+    <select id="equipamento-processo" required>
+        <option value="">Selecione um equipamento</option>
+    </select>
+
+    <label>Duração prevista do processo</label>
+
+    <div class="duracao-processo">
+        <div>
+            <label for="horas-processo">Horas</label>
+            <input
+                type="number"
+                id="horas-processo"
+                min="0"
+                max="24"
+                step="1"
+                value="0"
+                required
+            >
+        </div>
+
+        <div>
+            <label for="minutos-processo">Minutos</label>
+            <input
+                type="number"
+                id="minutos-processo"
+                min="0"
+                max="59"
+                step="1"
+                value="1"
+                required
+            >
+        </div>
+    </div>
+
+    <button type="submit">Cadastrar processo</button>
+
+</form>
+
+    </div>
+
+        <div class="card" style="margin-top: 20px;">
+         <h2>Processos cadastrados</h2>
+         <p id="mensagem-processos">Nenhum processo cadastrado ainda.</p>
+         <div id="lista-processos"></div>
+        </div>
+
+    </section>
+
 
         </main>
     </div>
 
      <script>
 
-    function mostrarTela(tela) {
+    
 
-        const inicio = document.querySelector('.indicadores');
-        const equipamentos = document.getElementById('tela-equipamentos');
+       
+function mostrarTela(tela) {
 
-        if (tela === 'inicio') {
-            inicio.style.display = 'grid';
-            equipamentos.style.display = 'none';
-        } else if (tela === 'equipamentos') {
-            inicio.style.display = 'none';
-            equipamentos.style.display = 'block';
-        }
+    const inicio = document.querySelector('.indicadores');
+    const cabecalho = document.getElementById('cabecalho-inicio');
+    const recomendacoes = document.getElementById('secao-recomendacoes');
 
+    const equipamentos = document.getElementById('tela-equipamentos');
+    const processos = document.getElementById('tela-processos');
+    const consumo = document.getElementById('tela-consumo');
+    const relatorios = document.getElementById('tela-relatorios');
+
+    if (inicio) {
+        inicio.style.display = tela === 'inicio' ? 'grid' : 'none';
     }
+
+    if (cabecalho) {
+        cabecalho.style.display = tela === 'inicio' ? 'block' : 'none';
+    }
+
+    if (recomendacoes) {
+        recomendacoes.style.display = tela === 'inicio' ? 'block' : 'none';
+    }
+
+    if (equipamentos) {
+        equipamentos.style.display =
+            tela === 'equipamentos' ? 'block' : 'none';
+    }
+
+    if (processos) {
+        processos.style.display =
+            tela === 'processos' ? 'block' : 'none';
+    }
+
+    if (consumo) {
+        consumo.style.display =
+            tela === 'consumo' ? 'block' : 'none';
+    }
+
+    if (relatorios) {
+        relatorios.style.display =
+            tela === 'relatorios' ? 'block' : 'none';
+    }
+
+
+     if (tela === 'processos') {
+    carregarEquipamentosNoSelect();
+    carregarProcessos();
+}
+
+    if (tela === 'consumo') {
+        carregarGraficoConsumo();
+    }
+
+    if (tela === 'relatorios') {
+        carregarRelatorio();
+    }
+
+    if (tela === 'inicio') {
+        carregarRecomendacoes();
+    }
+}
 
     const formulario = document.getElementById('form-equipamento');
     const lista = document.getElementById('lista-equipamentos');
@@ -186,12 +470,34 @@ equipamentos.forEach(function(equipamento) {
     const titulo = document.createElement('h3');
     titulo.textContent = equipamento.nome;
 
-    const detalhes = document.createElement('p');
-    detalhes.textContent =
-        'Tipo: ' + equipamento.tipo +
-        ' | Potência: ' + equipamento.potencia + ' W' +
-        ' | Funcionamento: ' + equipamento.horas + ' h/dia' +
-        ' | Status: ' + equipamento.status;
+    
+const detalhes = document.createElement('p');
+
+const totalMinutos = Math.round(Number(equipamento.horas) * 60);
+const horasInteiras = Math.floor(totalMinutos / 60);
+const minutosRestantes = totalMinutos % 60;
+
+let funcionamentoFormatado = '';
+
+if (horasInteiras > 0) {
+    funcionamentoFormatado = horasInteiras + ' h';
+}
+
+if (minutosRestantes > 0) {
+    funcionamentoFormatado +=
+        (funcionamentoFormatado ? ' e ' : '') +
+        minutosRestantes + ' min';
+}
+
+if (totalMinutos === 0) {
+    funcionamentoFormatado = '0 min';
+}
+
+detalhes.textContent =
+    'Tipo: ' + equipamento.tipo +
+    ' | Potência: ' + equipamento.potencia + ' W' +
+    ' | Funcionamento: ' + funcionamentoFormatado + '/dia' +
+    ' | Status: ' + equipamento.status;
 
     const consumoMensal =
         (equipamento.potencia * equipamento.horas * 30) / 1000;
@@ -304,9 +610,9 @@ botaoExcluir.style.marginTop = '10px';
 card.appendChild(botaoExcluir);
 
 // Programa o clique no botão Excluir
+
 botaoExcluir.addEventListener('click', async function() {
 
-    // Pede confirmação antes de excluir
     const confirmar = confirm(
         'Deseja realmente excluir o equipamento "' + equipamento.nome + '"?'
     );
@@ -316,23 +622,25 @@ botaoExcluir.addEventListener('click', async function() {
     }
 
     try {
-        // Solicita ao Spring Boot a exclusão do equipamento
         const resposta = await fetch('/api/equipamentos/' + equipamento.id, {
             method: 'DELETE'
         });
 
         if (!resposta.ok) {
-            throw new Error('Erro ao excluir equipamento.');
+            const mensagem = await resposta.text();
+
+            throw new Error(
+                mensagem || 'Não foi possível excluir o equipamento.'
+            );
         }
 
-        // Atualiza a lista e os indicadores
         await carregarEquipamentos();
 
         alert('Equipamento excluído com sucesso!');
 
     } catch (erro) {
         console.error(erro);
-        alert('Não foi possível excluir o equipamento.');
+        alert(erro.message);
     }
 });
 
@@ -390,14 +698,277 @@ document.getElementById('economia-total').textContent =
 
 carregarEquipamentos();
 
+async function carregarEquipamentosNoSelect() {
+    try {
+        const resposta = await fetch('/api/equipamentos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao buscar equipamentos.');
+        }
+
+        const equipamentos = await resposta.json();
+
+        const select = document.getElementById('equipamento-processo');
+
+        select.innerHTML = '<option value="">Selecione um equipamento</option>';
+
+        equipamentos.forEach(function(equipamento) {
+            const opcao = document.createElement('option');
+
+            opcao.value = equipamento.id;
+            opcao.textContent = equipamento.nome;
+
+            select.appendChild(opcao);
+        });
+
+    } catch (erro) {
+        console.error('Erro ao carregar equipamentos no formulário:', erro);
+    }
+}
+
+carregarEquipamentosNoSelect();
+
+
+async function carregarProcessos() {
+    try {
+        const resposta = await fetch('/api/processos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao buscar processos.');
+        }
+
+        const processos = await resposta.json();
+
+        const listaProcessos = document.getElementById('lista-processos');
+        const mensagem = document.getElementById('mensagem-processos');
+
+        listaProcessos.innerHTML = '';
+
+        processos.forEach(function(processo) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.marginTop = '15px';
+
+            const titulo = document.createElement('h3');
+            titulo.textContent = processo.nome;
+
+            const nomeEquipamento = processo.equipamento
+                ? processo.equipamento.nome
+                : 'Não informado';
+
+            
+    const detalhes = document.createElement('p');
+
+// Converte a duração decimal para horas e minutos
+    const totalMinutos = Math.round(Number(processo.horasExecucao) * 60);
+
+    const horas = Math.floor(totalMinutos / 60);
+    const minutos = totalMinutos % 60;
+
+    let duracaoFormatada = '';
+
+    if (horas > 0) {
+    duracaoFormatada += horas + ' h';
+   }
+
+    if (minutos > 0) {
+    duracaoFormatada += (duracaoFormatada ? ' e ' : '') + minutos + ' min';
+     }
+
+    if (totalMinutos === 0) {
+    duracaoFormatada = 'Não informada';
+       }
+
+detalhes.textContent =
+    'Equipamento: ' + nomeEquipamento +
+    ' | Duração prevista: ' + duracaoFormatada +
+    ' | Status: ' + processo.status;
+
+            const descricao = document.createElement('p');
+            descricao.textContent = processo.descricao || '';
+
+            card.appendChild(titulo);
+            card.appendChild(descricao);
+            card.appendChild(detalhes);
+
+            // Botão disponível quando o processo não está em execução
+            if (processo.status !== 'Em execução') {
+                const botaoIniciar = document.createElement('button');
+
+                botaoIniciar.textContent = '▶ Iniciar processo';
+                botaoIniciar.type = 'button';
+                botaoIniciar.style.marginTop = '12px';
+                botaoIniciar.style.padding = '10px 16px';
+                botaoIniciar.style.cursor = 'pointer';
+
+                botaoIniciar.addEventListener('click', async function() {
+                    botaoIniciar.disabled = true;
+                    botaoIniciar.textContent = 'Iniciando...';
+
+                    try {
+                        const respostaInicio = await fetch(
+                            '/api/processos/' + processo.id + '/iniciar',
+                            { method: 'POST' }
+                        );
+
+                        if (!respostaInicio.ok) {
+                            const mensagemErro = await respostaInicio.text();
+                            throw new Error(mensagemErro);
+                        }
+
+                        alert('Processo iniciado com sucesso!');
+
+                        await carregarProcessos();
+                        await carregarEquipamentos();
+
+                    } catch (erro) {
+                        alert('Erro ao iniciar processo: ' + erro.message);
+                        botaoIniciar.disabled = false;
+                        botaoIniciar.textContent = '▶ Iniciar processo';
+                    }
+                });
+
+                card.appendChild(botaoIniciar);
+
+            } else {
+                const aviso = document.createElement('p');
+                aviso.textContent = '⏳ Processo em execução';
+                aviso.style.marginTop = '12px';
+
+                card.appendChild(aviso);
+            }
+
+              
+            // Botão para excluir processos
+            const botaoExcluirProcesso = document.createElement('button');
+
+            botaoExcluirProcesso.textContent = '🗑 Excluir processo';
+            botaoExcluirProcesso.type = 'button';
+            botaoExcluirProcesso.style.marginTop = '12px';
+            botaoExcluirProcesso.style.marginLeft = '10px';
+            botaoExcluirProcesso.style.padding = '10px 16px';
+            botaoExcluirProcesso.style.cursor = 'pointer';
+
+            // Não permite excluir processos em execução
+            if (processo.status === 'Em execução') {
+                botaoExcluirProcesso.disabled = true;
+            }
+
+            botaoExcluirProcesso.addEventListener('click', async function() {
+
+                const confirmar = confirm(
+                    'Deseja realmente excluir o processo "' + processo.nome + '"?'
+                );
+
+                if (!confirmar) {
+                    return;
+                }
+
+                botaoExcluirProcesso.disabled = true;
+
+                try {
+                    const resposta = await fetch(
+                        '/api/processos/' + processo.id,
+                        { method: 'DELETE' }
+                    );
+
+                    if (!resposta.ok) {
+                        const mensagemErro = await resposta.text();
+
+                        throw new Error(
+                            mensagemErro || 'Não foi possível excluir o processo.'
+                        );
+                    }
+
+                    await carregarProcessos();
+                    await carregarEquipamentos();
+
+                    alert('Processo excluído com sucesso!');
+
+                } catch (erro) {
+                    console.error(erro);
+                    alert(erro.message);
+                    botaoExcluirProcesso.disabled = false;
+                }
+            });
+
+            card.appendChild(botaoExcluirProcesso);
+
+
+
+            listaProcessos.appendChild(card);
+        });
+
+        mensagem.style.display =
+            processos.length > 0 ? 'none' : 'block';
+
+    } catch (erro) {
+        console.error('Erro ao carregar processos:', erro);
+    }
+}
+
+carregarProcessos();
+
+const formularioProcesso = document.getElementById('form-processo');
+
+formularioProcesso.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const processo = {
+        nome: document.getElementById('nome-processo').value.trim(),
+        descricao: document.getElementById('descricao-processo').value.trim(),
+        horasExecucao:
+            Number(document.getElementById('horas-processo').value) +
+            Number(document.getElementById('minutos-processo').value) / 60,
+        
+        equipamento: {
+            id: Number(document.getElementById('equipamento-processo').value)
+        }
+    };
+
+    try {
+        const resposta = await fetch('/api/processos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(processo)
+        });
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao cadastrar processo.');
+        }
+
+        alert('Processo cadastrado com sucesso!');
+        formularioProcesso.reset();
+        await carregarProcessos();
+
+    } catch (erro) {
+        console.error(erro);
+        alert('Não foi possível cadastrar o processo.');
+    }
+});
+
     formulario.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const nome = document.getElementById('nome').value.trim();
         const tipo = document.getElementById('tipo').value;
+       
         const potencia = Number(document.getElementById('potencia').value);
-        const horas = Number(document.getElementById('horas').value);
-        const status = document.getElementById('status').value;
+
+        const horasInformadas = Number(document.getElementById('horas').value);
+        const minutosInformados = Number(document.getElementById('minutos-equipamento').value);
+
+        const horas = horasInformadas + (minutosInformados / 60);
+
+if (horas <= 0 || horas > 24) {
+    alert('Informe um tempo de funcionamento maior que zero e de no máximo 24 horas.');
+    return;
+}
+
+const status = document.getElementById('status').value;
+
 
         // Envia os dados do equipamento para o Spring Boot
 try {
@@ -433,6 +1004,292 @@ try {
 
 await carregarEquipamentos();
     });
+
+
+async function carregarRecomendacoes() {
+    const lista = document.getElementById('lista-recomendacoes');
+
+    try {
+        const resposta = await fetch('/api/equipamentos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao consultar equipamentos.');
+        }
+
+        const equipamentos = await resposta.json();
+
+        lista.innerHTML = '';
+
+        const ociosos = equipamentos.filter(function(equipamento) {
+            return equipamento.status === 'Ocioso';
+        });
+
+        if (ociosos.length === 0) {
+            lista.textContent =
+                'Nenhum equipamento ocioso cadastrado no momento.';
+            return;
+        }
+
+        ociosos.forEach(function(equipamento) {
+            const consumoMensal =
+                (equipamento.potencia * equipamento.horas * 30) / 1000;
+
+            const custoMensal = consumoMensal * 0.90;
+
+            // Simulação: redução de 50% do consumo informado.
+            const economiaEstimada = custoMensal * 0.50;
+
+            const recomendacao = document.createElement('div');
+            recomendacao.style.marginTop = '20px';
+
+            const titulo = document.createElement('h3');
+            titulo.textContent = '💻 ' + equipamento.nome;
+
+            const descricao = document.createElement('p');
+            descricao.textContent =
+                'Equipamento marcado como ocioso. ' +
+                'Avalie desligá-lo ou suspendê-lo quando não estiver em uso.';
+
+            const economia = document.createElement('p');
+            economia.textContent =
+                'Economia potencial ilustrativa: ' +
+                economiaEstimada.toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }) + '/mês';
+
+            recomendacao.appendChild(titulo);
+            recomendacao.appendChild(descricao);
+            recomendacao.appendChild(economia);
+
+            lista.appendChild(recomendacao);
+        });
+
+    } catch (erro) {
+        console.error(erro);
+        lista.textContent = 'Não foi possível carregar as recomendações.';
+    }
+}
+
+carregarRecomendacoes();
+
+let graficoConsumo = null;
+
+async function carregarGraficoConsumo() {
+    try {
+        const resposta = await fetch('/api/equipamentos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao consultar equipamentos.');
+        }
+
+        const equipamentos = await resposta.json();
+
+        const ordenados = equipamentos.map(function(equipamento) {
+            const consumo = (
+                equipamento.potencia *
+                equipamento.horas *
+                30
+            ) / 1000;
+
+            return {
+                nome: equipamento.nome,
+                consumo: consumo,
+                custo: consumo * 0.90
+            };
+        }).sort(function(a, b) {
+            return b.consumo - a.consumo;
+        });
+
+        const nomes = ordenados.map(item => item.nome);
+        const consumos = ordenados.map(item => item.consumo);
+
+        const canvas = document.getElementById('grafico-consumo');
+
+        if (graficoConsumo) {
+            graficoConsumo.destroy();
+        }
+
+        graficoConsumo = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: nomes,
+                datasets: [{
+                    label: 'Consumo mensal estimado (kWh)',
+                    data: consumos,
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const ranking = document.getElementById('ranking-consumo');
+        ranking.innerHTML = '';
+
+        if (ordenados.length === 0) {
+            ranking.textContent = 'Nenhum equipamento cadastrado.';
+            return;
+        }
+
+        ordenados.forEach(function(item, indice) {
+            const linha = document.createElement('p');
+
+            linha.textContent =
+                (indice + 1) + 'º - ' + item.nome +
+                ' | ' + item.consumo.toFixed(2) + ' kWh/mês' +
+                ' | R$ ' + item.custo.toFixed(2) + '/mês';
+
+            ranking.appendChild(linha);
+        });
+
+    } catch (erro) {
+        console.error('Erro ao carregar gráfico:', erro);
+    }
+}
+
+carregarGraficoConsumo();
+
+let graficoRelatorio = null;
+
+async function carregarRelatorio() {
+    const resumo = document.getElementById('resumo-relatorio');
+    const conclusoes = document.getElementById('conclusoes-relatorio');
+
+    try {
+        const resposta = await fetch('/api/equipamentos');
+
+        if (!resposta.ok) {
+            throw new Error('Erro ao consultar equipamentos.');
+        }
+
+        const equipamentos = await resposta.json();
+
+        let consumoTotal = 0;
+        let custoTotal = 0;
+        let economiaTotal = 0;
+        let totalOciosos = 0;
+
+        const dados = equipamentos.map(function(equipamento) {
+            const consumo = (
+                equipamento.potencia * equipamento.horas * 30
+            ) / 1000;
+
+            const custo = consumo * 0.90;
+
+            consumoTotal += consumo;
+            custoTotal += custo;
+
+            if (equipamento.status === 'Ocioso') {
+                totalOciosos++;
+                economiaTotal += custo * 0.50;
+            }
+
+            return {
+                nome: equipamento.nome,
+                custo: custo
+            };
+        });
+
+        const moeda = valor => valor.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        resumo.innerHTML = '';
+
+        const linhas = [
+            'Equipamentos cadastrados: ' + equipamentos.length,
+            'Consumo mensal estimado: ' + consumoTotal.toFixed(2) + ' kWh',
+            'Custo mensal estimado: ' + moeda(custoTotal),
+            'Equipamentos ociosos: ' + totalOciosos,
+            'Economia potencial ilustrativa: ' + moeda(economiaTotal)
+        ];
+
+        linhas.forEach(function(texto) {
+            const p = document.createElement('p');
+            p.textContent = texto;
+            resumo.appendChild(p);
+        });
+
+        conclusoes.innerHTML = '';
+
+        const conclusao = document.createElement('p');
+
+        if (totalOciosos > 0) {
+            conclusao.textContent =
+                'Foram identificados ' + totalOciosos +
+                ' equipamento(s) marcado(s) como ocioso(s). ' +
+                'Recomenda-se avaliar desligamento ou suspensão ' +
+                'quando não estiverem em uso. ' +
+                'A economia apresentada simula uma redução de 50% ' +
+                'no consumo desses equipamentos.';
+        } else {
+            conclusao.textContent =
+                'Nenhum equipamento está marcado como ocioso. ' +
+                'Continue acompanhando os custos estimados.';
+        }
+
+        conclusoes.appendChild(conclusao);
+
+        const canvas = document.getElementById('grafico-relatorio');
+
+        if (graficoRelatorio) {
+            graficoRelatorio.destroy();
+        }
+
+        if (dados.length === 0) {
+            return;
+        }
+
+        graficoRelatorio = new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: dados.map(item => item.nome),
+                datasets: [{
+                    label: 'Custo mensal estimado (R$)',
+                    data: dados.map(item => item.custo),
+                    backgroundColor: [
+                        '#3b82f6',
+                        '#22c55e',
+                        '#f59e0b',
+                        '#a855f7',
+                        '#ef4444',
+                        '#06b6d4'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#cbd5e1'
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (erro) {
+        console.error('Erro ao gerar relatório:', erro);
+        resumo.textContent = 'Não foi possível carregar o relatório.';
+    }
+}
+
+carregarRelatorio();
+
 
 </script>
 
