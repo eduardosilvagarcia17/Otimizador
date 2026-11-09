@@ -40,3 +40,14 @@ build/
 .env
 .env.*
 !.env.example
+
+# Banco de dados H2 local
+*.mv.db
+*.lock.db
+/data/
+
+# Arquivos temporarios e logs
+*.log
+
+# Arquivos de autenticacao local
+*.dll
